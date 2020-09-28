@@ -1,0 +1,76 @@
+drop table if exists residents cascade;
+drop table if exists cars cascade;
+drop table if exists apartments cascade;
+drop table if exists pets cascade;
+
+create table residents (
+id numeric(5) primary key,
+first_name varchar(30),
+last_name varchar(30),
+apartment_id numeric(5) 
+);
+
+create table cars (
+id numeric(5) primary key,
+make varchar(20),
+model varchar(20),
+year varchar(20),
+license_plate varchar(20),
+owner_id numeric(5) 
+);
+create table apartments (
+id numeric(5) primary key,
+building_letter varchar(5),
+room_number varchar(5),
+monthly_rent numeric(8,2)
+);
+create table pets (
+id numeric(5) primary key,
+breed varchar(20),
+name varchar(20),
+apartment_id numeric(5),
+is_service_animal numeric(1)
+);
+
+  
+INSERT INTO apartments VALUES
+  (1, 'A', 1, 1250),
+  (2, 'B', 1, 1300),
+  (3, 'C', 1, 1500),
+  (4, 'C', 2, 1400);
+
+INSERT INTO residents VALUES
+  (1, 'Jacob', 'Davis', 1),
+  (2, 'Sally', 'Bobson', 2),
+  (3, 'Ricky', 'Bobson', 2),
+  (4, 'Martha', 'Stuart', 3),
+  (5, 'Jackie', 'Samson', 4);
+
+INSERT INTO cars VALUES
+  (1, 'Toyota', 'Corolla', 1995, 'IGB18SS', 2),
+  (2, 'Honda', 'Civic', 2001, 'FFGB91S', 3);
+
+INSERT INTO pets VALUES
+  (1, 'cat', 'Jimmy', 3, 0),
+  (2, 'dog', 'Spot', 4, 1);
+
+select * from residents;
+
+ 
+select * from residents inner join apartments on residents.id = apartments.id;
+
+select * from
+(select * from residents inner join apartments on residents.id = apartments.id) as resident_apartments where resident_apartments.building_letter = 'B';
+
+select * from apartments;
+select avg(monthly_rent) from apartments where apartments.building_letter = 'C';
+
+select count(id) from pets;
+
+select first_name, last_name from
+(select * from pets left join residents on residents.apartment_id = pets.apartment_id) as dog_owner where dog_owner.name = 'Spot';
+
+select make from
+(select * from cars left join residents on cars.owner_id = residents.id) as car_owner where car_owner.first_name = 'Sally' and car_owner.last_name = 'Bobson';
+
+--select * from cars left join residents on cars.owner_id = residents.id
