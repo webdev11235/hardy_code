@@ -1,0 +1,56 @@
+drop table if exists roles cascade;
+drop table if exists account_status cascade;
+drop table if exists account_type cascade;
+drop table if exists users cascade;
+drop table if exists account cascade;
+
+create table roles (
+role_id serial primary key,
+role varchar(20) not null unique
+);
+
+insert into roles (role) values
+('Admin'),
+('Employee'),
+('Standard'),
+('Premium');
+
+create table account_status (
+status_id serial primary key,
+status varchar(20) not null unique
+);
+
+insert into account_status (status) values
+('Pending'),
+('Open'),
+('Closed'),
+('Denied');
+
+create table account_type (
+type_id serial primary key,
+type varchar(20) not null unique
+);
+
+insert into account_type (type) values
+('Checking'),
+('Savings');
+
+create table users (
+user_id serial primary key,
+username varchar(20) not null unique,
+password varchar(20) not null,
+firstname varchar(20) not null,
+lastname varchar(20) not null,
+email varchar(30) not null,
+role_id integer,
+foreign key (role_id) references roles(role_id)
+);
+
+create table account (
+account_id serial primary key,
+balance numeric(12, 2) not null,
+status_id integer,
+foreign key (status_id) references account_status(status_id),
+type_id integer,
+foreign key (type_id) references account_type(type_id)
+);
