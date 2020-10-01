@@ -54,3 +54,10 @@ foreign key (status_id) references account_status(status_id),
 type_id integer,
 foreign key (type_id) references account_type(type_id)
 );
+
+create table user_account (
+user_id integer,
+foreign key (user_id) references user(user_id),
+account_id integer,
+foreign key (account_id) references account(account_id)
+);
