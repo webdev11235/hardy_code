@@ -10,6 +10,6 @@ public interface AccountDAO {
 	public Account getAccountByAccountID(int accountID);
 	public List<Account> getAccountsByStatusID(int statusID);
 	public List<Account> getAccountsByUserAndType(int userID, String type);
-	public boolean closeAccount();
+	public boolean closeAccount(Account account);
 	public boolean updateAccount(Account account);
 }

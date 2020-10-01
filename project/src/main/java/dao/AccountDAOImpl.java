@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import model.Account;
@@ -16,11 +15,7 @@ import utilities.DAOUtilities;
 public class AccountDAOImpl implements AccountDAO {
 	Connection connection = null;
 	PreparedStatement stmt = null;
-	
-	HashMap<Integer, String> typeMap = AccountTypeDAOImpl.getTypesMap();
-	HashMap<Integer, String> roleMap = RolesDAOImpl.getRolesMap();
-	HashMap<Integer, String> statusMap = AccountStatusDAOImpl.getStatusMap();
-	
+		
 	@Override
 	public List<Account> getAllAccounts() {
 		List<Account> accounts = new ArrayList<Account>();
@@ -36,16 +31,10 @@ public class AccountDAOImpl implements AccountDAO {
 				account.setAccountId(rs.getInt("account_id"));
 				account.setBalance(rs.getDouble("balance"));
 				
-				AccountStatus status = new AccountStatus();
-				int statusID = rs.getInt("status_id");
-				status.setStatusId(statusID);
-				status.setStatus(statusMap.get(statusID));
+				AccountStatus status = AccountStatusDAOImpl.getStatusObj(rs.getInt("type_id"));
 				account.setStatus(status);
 				
-				AccountType type = new AccountType();
-				int typeID = rs.getInt("type_id");
-				type.setTypeId(typeID);
-				type.setType(typeMap.get(typeID));
+				AccountType type = AccountTypeDAOImpl.getAccountTypeObj(rs.getInt("type_id"));
 				account.setType(type);
 				
 				accounts.add(account);
@@ -104,19 +93,13 @@ public class AccountDAOImpl implements AccountDAO {
 				account.setAccountId(rs.getInt("account_id"));
 				account.setBalance(rs.getDouble("balance"));
 				
-				AccountStatus status = new AccountStatus();
-				int statusID = rs.getInt("status_id");
-				status.setStatusId(statusID);
-				status.setStatus(statusMap.get(statusID));
+				AccountStatus status = AccountStatusDAOImpl.getStatusObj(rs.getInt("status_id"));
 				account.setStatus(status);
 				
-				AccountType type = new AccountType();
-				int typeID = rs.getInt("type_id");
-				type.setTypeId(typeID);
-				type.setType(typeMap.get(typeID));
+				AccountType type = AccountTypeDAOImpl.getAccountTypeObj(rs.getInt("type_id"));
 				account.setType(type);
 			}
-			
+			rs.close();
 		}
 		catch(SQLException e) {
 			
@@ -129,23 +112,124 @@ public class AccountDAOImpl implements AccountDAO {
 	
 	@Override
 	public List<Account> getAccountsByStatusID(int statusID) {
-		// TODO Auto-generated method stub
-		return null;
+		List<Account> accounts = new ArrayList<Account>();
+		
+		try {
+			connection = DAOUtilities.getConnection();
+			String sql = "select * from account where status_id=?";
+			stmt = connection.prepareStatement(sql);
+			stmt.setInt(1, statusID);
+			ResultSet rs = stmt.executeQuery();
+			
+			while (rs.next()) {
+				Account account = new Account();
+				account.setAccountId(rs.getInt("account_id"));
+				account.setBalance(rs.getDouble("balance"));
+				
+				AccountStatus status = AccountStatusDAOImpl.getStatusObj(rs.getInt("status_id"));
+				account.setStatus(status);
+				
+				AccountType type = AccountTypeDAOImpl.getAccountTypeObj(rs.getInt("type_id"));
+				account.setType(type);
+				accounts.add(account);
+			}
+			rs.close();
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		finally {
+			closeResources();
+		}
+		return accounts;
 	}
 	@Override
 	public List<Account> getAccountsByUserAndType(int userID, String type) {
-		// TODO Auto-generated method stub
-		return null;
+		List<Account> accounts = new ArrayList<Account>();
+		try {
+			connection = DAOUtilities.getConnection();
+			String sql = "select account.* from users\r\n"
+					+ "left join user_account on users.user_id=?\r\n"
+					+ "left join account on user_account.account_id = account.account_id\r\n"
+					+ "where account.type_id = (Select type_id from account_type where type=?)";
+			stmt = connection.prepareStatement(sql);
+			stmt.setInt(1, userID);
+			stmt.setString(2, type);
+			ResultSet rs = stmt.executeQuery();
+			
+			while (rs.next()) {
+				Account account = new Account();
+				account.setAccountId(rs.getInt("account_id"));
+				account.setBalance(rs.getDouble("balance"));
+				
+				AccountStatus status = AccountStatusDAOImpl.getStatusObj(rs.getInt("status_id"));
+				account.setStatus(status);
+				
+				AccountType accountType = AccountTypeDAOImpl.getAccountTypeObj(rs.getInt("type_id"));
+				account.setType(accountType);
+				accounts.add(account);
+			}
+			rs.close();
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		finally {
+			closeResources();
+		}
+		return accounts;
 	}
 	@Override
-	public boolean closeAccount() {
-		// TODO Auto-generated method stub
+	public boolean closeAccount(Account account) {
+		try {
+			connection = DAOUtilities.getConnection();
+			String sql = "update account set status_id = (select status_id from account_status where status = 'Closed')\r\n"
+					+ "where account_id= ?";
+			stmt = connection.prepareStatement(sql);
+			stmt.setInt(1, account.getAccountId());
+			
+			if (stmt.executeUpdate() != 0) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		finally {
+			closeResources();
+		}
 		return false;
 	}
 	@Override
 	public boolean updateAccount(Account account) {
-		// TODO Auto-generated method stub
+		try {
+			connection = DAOUtilities.getConnection();
+			String sql = "update account set balance = ?, status_id = ? type_id = ? where account_id = ?;";
+			stmt = connection.prepareStatement(sql);
+			stmt.setDouble(1, account.getBalance());
+			stmt.setInt(2, account.getStatus().getStatusId());
+			stmt.setInt(3, account.getType().getTypeId());
+			stmt.setInt(4, account.getAccountId());
+			
+			
+			if (stmt.executeUpdate() != 0) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		finally {
+			closeResources();
+		}
 		return false;
+	
 	}
 	
 	private void closeResources() {

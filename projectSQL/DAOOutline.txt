@@ -1,0 +1,84 @@
+public List<Account> getAllAccounts();
+sql = select * from account;
+
+public boolean createAccount();
+sql = insert into account values (?, ?, ?)
+*0: accountID 
+1: balance
+2: StatusID
+3: typeID
+
+public Account getAccountByAccountID(int accountID);
+sql = select * from account where account_id=?
+1: accountID
+
+public List<Account> getAccountsByStatusID(int statusID);
+sql = select * from account where status_id=?
+1: statusID
+
+public List<Account> getAccountsByUserAndType(int userID, String type);
+
+sql =select account.* from users
+left join user_account on users.user_id=?
+left join account on user_account.account_id = account.account_id
+where account.type_id = (Select type_id from account_type where type=?);
+1: userID
+2  type
+
+public boolean closeAccount(accountID);
+sql = update account set status_id = (select status_id from account_status where status = 'Closed')
+where account_id= ?;
+1: accountID
+
+public boolean updateAccount(Account account);
+sql = update account set balance = ?, status_id = ? type_id = ? where account_id = ?;
+1: account.getAccountId();
+2: account.getStatus();
+3: account.getType();
+
+-----------------------------------------------------------------------------------------
+public List<User> getAllCustomers();
+sql = select * from users;
+
+public User getCustomerByUsername(String username);
+sql = select * from users where username = ?;
+1: username
+
+public User getCustomerByID(int id);
+sql = select * from users where user_id = ?;
+1: id
+
+public boolean createCustomerProfile(User user);
+sql = insert into users (username, "password", firstname, lastname, email, role_id) values
+(?, ?, ?, ?, ?, ?);
+1: user.getUsername()
+2: user.getPassword()
+3: user.getFirstName()
+4: user.getLastName()
+5: user.getEmail();
+6: user.getRole().getRoleId();
+
+public boolean updateCustomerProfile(User user);
+sql = update users set username=?, password=?, firstname=?, lastname=?, email=?, role_id=?
+where user_id = ?;
+1: user.getUsername()
+2: user.getPassword()
+3: user.getFirstName()
+4: user.getLastName()
+5: user.getEmail();
+6: user.getRole().getRoleId();
+
+public boolean deleteCustomer(User user);
+sql = delete from users where user_id = ?;
+1: user.userID
+
+ 
+
+
+
+
+
+
+
+
+
