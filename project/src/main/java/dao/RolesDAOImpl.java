@@ -5,7 +5,7 @@ import java.util.HashMap;
 import model.Role;
 
 public class RolesDAOImpl implements RoleDAO{
-	public static Role getRolesMap(int roleID) {
+	public static Role getRolesObj(int roleID) {
 		HashMap<Integer, String> roleMap = new HashMap<Integer, String>();
 		roleMap.put(1, "Admin");
 		roleMap.put(2, "Employee");

@@ -35,7 +35,7 @@ public class UserDAOImpl implements UserDAO {
 				user.setPassword(rs.getString("password"));
 				user.setEmail(rs.getString("email"));
 				
-				Role role = RolesDAOImpl.getRolesMap(rs.getInt("role_id"));
+				Role role = RolesDAOImpl.getRolesObj(rs.getInt("role_id"));
 				user.setRole(role);
 				
 				users.add(user);
@@ -61,6 +61,7 @@ public class UserDAOImpl implements UserDAO {
 			ResultSet rs = stmt.executeQuery();
 			
 			if (rs.next()) {
+				user = new User();
 				user.setUserId(rs.getInt("user_id"));
 				user.setFirstName(rs.getString("firstname"));
 				user.setLastName(rs.getString("lastname"));
@@ -68,7 +69,7 @@ public class UserDAOImpl implements UserDAO {
 				user.setPassword(rs.getString("password"));
 				user.setEmail(rs.getString("email"));
 				
-				Role role = RolesDAOImpl.getRolesMap(rs.getInt("role_id"));
+				Role role = RolesDAOImpl.getRolesObj(rs.getInt("role_id"));
 				user.setRole(role);
 				
 			
@@ -94,6 +95,7 @@ public class UserDAOImpl implements UserDAO {
 			ResultSet rs = stmt.executeQuery();
 			
 			if (rs.next()) {
+				user = new User();
 				user.setUserId(rs.getInt("user_id"));
 				user.setFirstName(rs.getString("firstname"));
 				user.setLastName(rs.getString("lastname"));
@@ -101,7 +103,7 @@ public class UserDAOImpl implements UserDAO {
 				user.setPassword(rs.getString("password"));
 				user.setEmail(rs.getString("email"));
 				
-				Role role = RolesDAOImpl.getRolesMap(rs.getInt("role_id"));
+				Role role = RolesDAOImpl.getRolesObj(rs.getInt("role_id"));
 				user.setRole(role);
 				
 			
