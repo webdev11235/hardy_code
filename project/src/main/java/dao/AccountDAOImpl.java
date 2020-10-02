@@ -31,7 +31,7 @@ public class AccountDAOImpl implements AccountDAO {
 				account.setAccountId(rs.getInt("account_id"));
 				account.setBalance(rs.getDouble("balance"));
 				
-				AccountStatus status = AccountStatusDAOImpl.getStatusObj(rs.getInt("type_id"));
+				AccountStatus status = AccountStatusDAOImpl.getStatusObj(rs.getInt("status_id"));
 				account.setStatus(status);
 				
 				AccountType type = AccountTypeDAOImpl.getAccountTypeObj(rs.getInt("type_id"));
@@ -56,12 +56,13 @@ public class AccountDAOImpl implements AccountDAO {
 	public boolean createAccount(Account account) {
 		try {
 			connection = DAOUtilities.getConnection();
-			String sql = "insert into account values (?, ?, ?)";
+			String sql = "insert into account (balance, status_id, type_id) values (?, ?, ?)";
 			stmt = connection.prepareStatement(sql);
 			
 			stmt.setDouble(1, account.getBalance());
-			stmt.setInt(2, account.getStatus().getStatusId());
-			stmt.setInt(3, account.getType().getTypeId());
+			stmt.setInt(2, account.getType().getTypeId());
+			stmt.setInt(3, account.getStatus().getStatusId());
+			
 			
 			if (stmt.executeUpdate() != 0) {
 				return true;
@@ -148,10 +149,11 @@ public class AccountDAOImpl implements AccountDAO {
 		List<Account> accounts = new ArrayList<Account>();
 		try {
 			connection = DAOUtilities.getConnection();
-			String sql = "select account.* from users\r\n"
-					+ "left join user_account on users.user_id=?\r\n"
-					+ "left join account on user_account.account_id = account.account_id\r\n"
-					+ "where account.type_id = (Select type_id from account_type where type=?)";
+			String sql = "select account.* from user_account \r\n"
+					+ "left join account on user_account.account_id = account.account_id \r\n"
+					+ "left join users on user_account.user_id = users.user_id\r\n"
+					+ "where users.user_id = ? and account.type_id = (select type_id from account_type where type=?);\r\n"
+					+ "";
 			stmt = connection.prepareStatement(sql);
 			stmt.setInt(1, userID);
 			stmt.setString(2, type);
@@ -207,7 +209,7 @@ public class AccountDAOImpl implements AccountDAO {
 	public boolean updateAccount(Account account) {
 		try {
 			connection = DAOUtilities.getConnection();
-			String sql = "update account set balance = ?, status_id = ? type_id = ? where account_id = ?;";
+			String sql = "update account set balance = ?, status_id = ?, type_id = ? where account_id = ?";
 			stmt = connection.prepareStatement(sql);
 			stmt.setDouble(1, account.getBalance());
 			stmt.setInt(2, account.getStatus().getStatusId());

@@ -1,6 +1,11 @@
 package model;
 
 public class Account {
+	@Override
+	public String toString() {
+		return "Account [accountId=" + accountId + ", balance=" + balance + ", status=" + status + ", type=" + type
+				+ "]";
+	}
 	private int accountId; // primary key
 	private double balance; // not null
 	private AccountStatus status;

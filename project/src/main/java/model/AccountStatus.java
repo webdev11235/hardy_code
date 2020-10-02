@@ -15,5 +15,9 @@ public class AccountStatus {
 	}
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	@Override
+	public String toString() {
+		return "AccountStatus [statusId=" + statusId + ", status=" + status + "]";
 	}	
 }
